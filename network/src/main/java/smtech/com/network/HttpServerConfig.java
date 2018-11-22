@@ -2,10 +2,10 @@ package smtech.com.network;
 
 //http服务器配置类
 public class HttpServerConfig {
-    public static String host;
-    public static int port;
+    private static String host;
+    private static int port;
 
-    public static String cmdPath;
+    private static String cmdPath;
 
     public static String getHost() {
         return host;
