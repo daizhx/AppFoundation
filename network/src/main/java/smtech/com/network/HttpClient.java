@@ -40,8 +40,12 @@ public class HttpClient {
 
     private String genUrl(String api){
         if(api == null){
-            //api公用一个接口转发
-            return "http://" + serverHost + ":" + serverPort + "/" + HttpServerConfig.getCmdPath();
+            //不同请求用一个URL转发,通过不同参数来标识不同的请求
+            String path = HttpServerConfig.getCmdPath();
+            if(!path.startsWith("/")){
+                path += "/" + path;
+            }
+            return "http://" + serverHost + ":" + serverPort + path;
         }
         return "http://" + serverHost + ":" + serverPort +"/" + api;
     }
