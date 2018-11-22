@@ -40,6 +40,7 @@ public class HttpClient {
 
     private String genUrl(String api){
         if(api == null){
+            //api公用一个接口转发
             return "http://" + serverHost + ":" + serverPort + "/" + HttpServerConfig.getCmdPath();
         }
         return "http://" + serverHost + ":" + serverPort +"/" + api;
@@ -49,6 +50,7 @@ public class HttpClient {
     public void post(String json, final HttpRequestCallback callback){
         post(null,json,callback);
     }
+
     public void post(String api, String json, final HttpRequestCallback callback){
         RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
@@ -64,7 +66,13 @@ public class HttpClient {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String ret = response.body().toString();
+                int httpCode = response.code();
+                if(httpCode != 200){
+                    callback.onFailure(response.message());
+                    return;
+                }
+
+                String ret = response.body().string();
                 JSONObject json = null;
                 try {
                     json = new JSONObject(ret);
