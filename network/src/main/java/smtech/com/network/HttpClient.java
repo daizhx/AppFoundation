@@ -29,6 +29,7 @@ public class HttpClient {
         this.serverPort = port;
     }
 
+    //默认从HttpServerConfig获取服务器信息
     public HttpClient(){
         serverHost = HttpServerConfig.getHost();
         serverPort = HttpServerConfig.getPort();
@@ -101,7 +102,7 @@ public class HttpClient {
         return res.body().string();
     }
 
-
+    //同步提交数据,返回json对象
     public JSONObject post2(String json) throws IOException{
         return post2(null,json);
     }
