@@ -7,10 +7,9 @@
 
     <application>
         <activity
-            android:name=".activity.SignInActivity"
+            android:name=".SignInActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme" />
-        <activity android:name=".activity.SignUpActivity"></activity>
     </application>
 
 </manifest>
