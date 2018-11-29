@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -208,5 +209,46 @@ public class HttpClient {
     public HttpRequestResult post3(String api,String json) throws IOException{
         JSONObject ret = post2(api,json);
         return new HttpRequestResult(ret);
+    }
+
+
+    /**
+     * post请求，不依赖配置数据，自定义超时参数
+     * @param url 完整的url地址
+     * @param json
+     * @param timerOut
+     * @return 返回字符串
+     * @throws IOException
+     */
+    public String postURL(String url,String json,int timerOut) throws IOException{
+        RequestBody body = RequestBody.create(JSON,json);
+        Request request = new Request.Builder().url(url).post(body).build();
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        OkHttpClient client = builder.connectTimeout(timerOut/2, TimeUnit.MILLISECONDS)
+                .readTimeout(timerOut,TimeUnit.MILLISECONDS)
+                .writeTimeout(timerOut,TimeUnit.MILLISECONDS).build();
+
+        Response res = client.newCall(request).execute();
+        return res.body().string();
+    }
+
+    /**
+     * post请求，不依赖配置数据，自定义超时参数
+     * @param url 完整的url地址
+     * @param json
+     * @param timeOut
+     * @return json对象
+     * @throws IOException
+     */
+    public JSONObject postURLJson(String url,String json,int timeOut) throws IOException{
+        String retStr= postURL(url,json,timeOut);
+        JSONObject ret = null;
+        try {
+            ret = new JSONObject(retStr);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            ret = new JSONObject();
+        }
+        return ret;
     }
 }
