@@ -1,10 +1,17 @@
 package smtech.com.utils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.zip.ZipException;
 
 public class FileUtil {
 	public static void rmv(String path) {
@@ -95,5 +102,70 @@ public class FileUtil {
 		}
 
 	}
+
+
+    /**
+     * 使用 org.apache.tools.zip.ZipFile 解压文件，它与 java 类库中的 java.util.zip.ZipFile
+     * 使用方式是一新的，只不过多了设置编码方式的 接口。
+     *
+     * 注，apache 没有提供 ZipInputStream 类，所以只能使用它提供的ZipFile 来读取压缩文件。
+     *
+     * @param archive
+     *            压缩包路径
+     * @param decompressDir
+     *            解压路径
+     * @param newFiles 记录解压出来的文件，没什么实际作用
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws ZipException
+     */
+    public static void upZipFile(String archive, String decompressDir,
+                                 List<String> newFiles) throws IOException, FileNotFoundException,
+            ZipException {
+        if (newFiles == null)
+            newFiles = new LinkedList<String>();
+
+        BufferedInputStream bi;
+        org.apache.tools.zip.ZipFile zf = new org.apache.tools.zip.ZipFile(
+                archive, "GBK");// 支持中文
+
+        Enumeration e = zf.getEntries();
+        while (e.hasMoreElements()) {
+            org.apache.tools.zip.ZipEntry ze2 = (org.apache.tools.zip.ZipEntry) e
+                    .nextElement();
+            String entryName = ze2.getName();
+            String path = decompressDir + "/" + entryName;
+            if (ze2.isDirectory()) {
+                File decompressDirFile = new File(path);
+                if (!decompressDirFile.exists()) {
+                    decompressDirFile.mkdirs();
+                }
+                newFiles.add(decompressDirFile.getAbsolutePath());
+            } else {
+                String fileDir = path.substring(0, path.lastIndexOf("/"));
+                File fileDirFile = new File(fileDir);
+                if (!fileDirFile.exists()) {
+                    fileDirFile.mkdirs();
+                }
+                if (decompressDir.lastIndexOf("/") == decompressDir.length() - 1){
+                    newFiles.add(decompressDir + entryName);
+                } else {
+                    newFiles.add(decompressDir + "/" + entryName);
+                }
+
+                BufferedOutputStream bos = new BufferedOutputStream(
+                        new FileOutputStream(decompressDir + "/" + entryName));
+                bi = new BufferedInputStream(zf.getInputStream(ze2));
+                byte[] readContent = new byte[1024];
+                int readCount = bi.read(readContent);
+                while (readCount != -1) {
+                    bos.write(readContent, 0, readCount);
+                    readCount = bi.read(readContent);
+                }
+                bos.close();
+            }
+        }
+        zf.close();
+    }
 
 }
