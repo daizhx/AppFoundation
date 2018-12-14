@@ -12,7 +12,6 @@ public abstract class PrerequireTask<Params, Progress, Result> extends AsyncTask
     //提示新
     private String hintMsg;
 
-
     protected PrerequireTask(Context context) {
         this.context = context;
         init();
