@@ -1,1 +1,1 @@
-include ':app', ':network', ':log', ':user', ':splash'
+include ':app', ':network', ':log', ':user', ':splash', ':utils'
